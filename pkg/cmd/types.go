@@ -36,6 +36,8 @@ type ContainerLayerScannerOptions struct {
 	// PostResultURL represents an URL where the image-inspector should post the results of
 	// the scan.
 	PostResultURL string
+	// OutFile is the name of the file on disk to write
+	OutFile string
 }
 
 // NewDefaultContainerLayerScannerOptions provides a new ImageInspectorOptions with default values.
@@ -45,6 +47,7 @@ func NewDefaultContainerLayerScannerOptions() *ContainerLayerScannerOptions {
 		ScanResultsDir: "",
 		ClamSocket:     "/host/var/run/clamd.scan/clamd.sock",
 		PostResultURL:  "",
+		OutFile:        "scanresults.txt",
 	}
 }
 

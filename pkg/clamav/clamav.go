@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rhdedgar/container-layer-scanner/pkg/containerspec"
+	//"github.com/rhdedgar/container-layer-scanner/pkg/containerspec"
 
 	"github.com/openshift/clam-scanner/pkg/clamav"
 	"github.com/rhdedgar/container-layer-scanner/pkg/api"
@@ -31,6 +31,7 @@ var _ api.Scanner = &ClamScanner{}
 func NewScanner(socket string) (api.Scanner, error) {
 	clamSession, err := clamav.NewClamdSession(socket, true)
 	if err != nil {
+		fmt.Println("NewScanner error")
 		return nil, err
 	}
 	return &ClamScanner{
@@ -40,10 +41,11 @@ func NewScanner(socket string) (api.Scanner, error) {
 }
 
 // Scan will scan the image
-func (s *ClamScanner) Scan(ctx context.Context, path string, image *containerspec.Image, filter api.FilesFilter) ([]api.Result, interface{}, error) {
+func (s *ClamScanner) Scan(ctx context.Context, path string, filter api.FilesFilter) ([]api.Result, interface{}, error) {
 	scanResults := []api.Result{}
 	// Useful for debugging
 	scanStarted := time.Now()
+	fmt.Println(scanResults)
 	defer func() {
 		log.Printf("clamav scan took %ds (%d problems found)", int64(time.Since(scanStarted).Seconds()), len(scanResults))
 	}()
@@ -65,7 +67,7 @@ func (s *ClamScanner) Scan(ctx context.Context, path string, image *containerspe
 		}
 		scanResults = append(scanResults, r)
 	}
-
+	fmt.Println(scanResults)
 	return scanResults, nil, nil
 }
 
