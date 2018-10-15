@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	//"github.com/rhdedgar/container-layer-scanner/pkg/containerspec"
-
 	"github.com/openshift/clam-scanner/pkg/clamav"
 	"github.com/rhdedgar/container-layer-scanner/pkg/api"
 )

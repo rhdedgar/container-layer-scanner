@@ -4,23 +4,6 @@ import (
 	"context"
 	"os"
 	"time"
-
-	"github.com/rhdedgar/container-layer-scanner/pkg/containerspec"
-)
-
-// OpenSCAPStatus is the status of openscap scan
-type OpenSCAPStatus string
-
-const (
-	StatusNotRequested OpenSCAPStatus = "NotRequested"
-	StatusSuccess      OpenSCAPStatus = "Success"
-	StatusError        OpenSCAPStatus = "Error"
-	// PullAlways means that image-inspector always attempts to pull the latest image.  Inspection will fail If the pull fails.
-	PullAlways string = "always"
-	// PullNever means that image-inspector never pulls an image, but only uses a local image.  Inspection will fail if the image isn't present
-	PullNever string = "never"
-	// PullIfNotPresent means that image-inspector pulls if the image isn't present on disk. Inspection will fail if the image isn't present and the pull fails.
-	PullIfNotPresent string = "when-missing"
 )
 
 // The default version for the result API object
@@ -74,21 +57,8 @@ type Summary struct {
 	Label Severity
 }
 
-type OpenSCAPMetadata struct {
-	Status           OpenSCAPStatus // Status of the OpenSCAP scan report
-	ErrorMessage     string         // Error message from the openscap
-	ContentTimeStamp string         // Timestamp for this data
-}
-
-func (osm *OpenSCAPMetadata) SetError(err error) {
-	osm.Status = StatusError
-	osm.ErrorMessage = err.Error()
-	osm.ContentTimeStamp = string(time.Now().Format(time.RFC850))
-}
-
 var (
-	ScanOptions       = []string{"openscap", "clamav"}
-	PullPolicyOptions = []string{PullAlways, PullNever, PullIfNotPresent}
+	ScanOptions = []string{"clamav"}
 )
 
 // APIVersions holds a slice of supported API versions.
@@ -109,10 +79,4 @@ type Scanner interface {
 
 	// Name is the scanner's name
 	Name() string
-}
-
-// ImageAcquirer abstract getting an image and extracting it in a given directory
-type ImageAcquirer interface {
-	// Acquire gets the image from `source` and extract it in `dest` which is the first output
-	Acquire(source string) (string, containerspec.Image, ScanResult, FilesFilter, error)
 }

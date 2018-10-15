@@ -96,6 +96,13 @@ func (i *defaultContainerLayerScanner) acquireAndScan() error {
 		}
 	}
 
+	if len(i.opts.OutFile) > 0 {
+		if err := i.writeFile(i.scanOutputs.ScanResults); err != nil {
+			log.Printf("Error writing file: %v", err)
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -116,5 +123,30 @@ func (i *defaultContainerLayerScanner) postResults(scanResults api.ScanResult) e
 		return err
 	}
 	log.Printf("DEBUG: Success: %v", resp)
+	return nil
+}
+
+func (i *defaultContainerLayerScanner) writeFile(scanResults api.ScanResult) error {
+	outFile := i.opts.OutFile
+	log.Printf("Writing results to %q ...", outFile)
+
+	openFile, err := os.Create(outFile)
+	if err != nil {
+		return err
+	}
+
+	defer openFile.Close()
+
+	jOut, err := json.Marshal(scanResults)
+	if err != nil {
+		return err
+	}
+
+	fileWrite, err := openFile.WriteString(string(jOut))
+	if err != nil {
+		return err
+	}
+	fmt.Printf("wrote %d bytes\n", fileWrite)
+
 	return nil
 }
