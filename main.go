@@ -13,7 +13,7 @@ func main() {
 
 	flag.StringVar(&scannerOptions.ScanDir, "scan-dir", scannerOptions.ScanDir, "Docker container to inspect (cannot be used with the image option)")
 	flag.StringVar(&scannerOptions.ScanResultsDir, "scan-results-dir", scannerOptions.ScanResultsDir, "The directory that will contain the results of the scan")
-	flag.StringVar(&scannerOptions.ClamSocket, "clam-socket", scannerOptions.ClamSocket, "Location of clamav socket file (default: '')")
+	flag.StringVar(&scannerOptions.ClamSocket, "clam-socket", scannerOptions.ClamSocket, "Location of clamav socket file ")
 	flag.StringVar(&scannerOptions.PostResultURL, "post-results-url", scannerOptions.PostResultURL, "After scan finish, HTTP POST the results to this URL")
 	flag.StringVar(&scannerOptions.OutFile, "out-file", scannerOptions.OutFile, "Write the results of the scan to a local file)")
 

@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	//	"time"
 
 	"github.com/rhdedgar/container-layer-scanner/pkg/api"
 	"github.com/rhdedgar/container-layer-scanner/pkg/clamav"
@@ -39,10 +40,7 @@ type scanOutputs struct {
 
 // defaultContainerLayerScanner is the default implementation of ContainerLayerScanner.
 type defaultContainerLayerScanner struct {
-	opts cmd.ContainerLayerScannerOptions
-	//	meta api.InspectorMetadata
-	// an optional image server that will server content for inspection.
-
+	opts        cmd.ContainerLayerScannerOptions
 	scanOutputs scanOutputs
 }
 
@@ -64,7 +62,7 @@ func NewDefaultContainerLayerScanner(opts cmd.ContainerLayerScannerOptions) Cont
 func (i *defaultContainerLayerScanner) ClamScanner() error {
 	err := i.acquireAndScan()
 	if err != nil {
-		fmt.Println(err)
+		return fmt.Errorf("failed to acquire and scan: %v", err.Error())
 	}
 
 	return err
@@ -73,18 +71,12 @@ func (i *defaultContainerLayerScanner) ClamScanner() error {
 // AcquireAndScan acquires and scans the image based on the ContainerLayerScannerOptions.
 func (i *defaultContainerLayerScanner) acquireAndScan() error {
 	var (
-		scanner api.Scanner
-		err     error
-		//source  string
-
+		scanner  api.Scanner
+		err      error
 		filterFn api.FilesFilter
 	)
 
 	ctx := context.Background()
-
-	//if len(i.opts.ScanDir) != 0 {
-	//	source = i.opts.ScanDir
-	//}
 
 	scanner, err = clamav.NewScanner(i.opts.ClamSocket)
 	if err != nil {
@@ -100,13 +92,6 @@ func (i *defaultContainerLayerScanner) acquireAndScan() error {
 	if len(i.opts.PostResultURL) > 0 {
 		if err := i.postResults(i.scanOutputs.ScanResults); err != nil {
 			log.Printf("Error posting results: %v", err)
-			return err
-		}
-	}
-
-	if len(i.opts.OutFile) > 0 {
-		if err := i.writeFile(i.scanOutputs.ScanResults); err != nil {
-			log.Printf("Error writing file: %v", err)
 			return err
 		}
 	}
@@ -131,32 +116,5 @@ func (i *defaultContainerLayerScanner) postResults(scanResults api.ScanResult) e
 		return err
 	}
 	log.Printf("DEBUG: Success: %v", resp)
-	return nil
-}
-
-func (i *defaultContainerLayerScanner) writeFile(scanResults api.ScanResult) error {
-	outFile := i.opts.OutFile
-	log.Printf("Writing results to %q ...", outFile)
-
-	openFile, err := os.Create(outFile)
-	if err != nil {
-		return err
-	}
-
-	defer openFile.Close()
-
-	//var temp api.ScanResult
-
-	jOut, err := json.Marshal(scanResults)
-	if err != nil {
-		return err
-	}
-
-	fileWrite, err := openFile.WriteString(string(jOut))
-	if err != nil {
-		return err
-	}
-	fmt.Printf("wrote %d bytes\n", fileWrite)
-
 	return nil
 }
